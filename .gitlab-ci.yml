@@ -1,0 +1,18 @@
+stages:
+  - build
+  - test
+
+build:
+  stage: build
+  image: gradle:jdk17
+  script:
+    - ./gradlew build
+  artifacts:
+    paths:
+      - build/libs/
+
+test:
+  stage: test
+  image: gradle:jdk17
+  script:
+    - ./gradlew test

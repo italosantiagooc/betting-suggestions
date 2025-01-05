@@ -1,0 +1,52 @@
+name: Build and Deploy Betting Suggestions
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: Set environment variables and set active profile
+        run: |
+          if [[ $GITHUB_REF == "refs/heads/main" ]]; then
+            echo "Setting production environment variables"
+            echo "SPRING_PROFILES_ACTIVE=prod" >> $GITHUB_ENV
+            echo "DB_URL=${{ secrets.DB_URL_PROD }}" >> $GITHUB_ENV
+            echo "DB_USERNAME=${{ secrets.DB_USERNAME_PROD }}" >> $GITHUB_ENV
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD_PROD }}" >> $GITHUB_ENV
+            echo "DB_DRIVER=${{ secrets.DB_DRIVER_PROD }}" >> $GITHUB_ENV
+          elif [[ $GITHUB_REF == "refs/heads/develop" ]]; then
+            echo "Setting development environment variables"
+            echo "SPRING_PROFILES_ACTIVE=dev" >> $GITHUB_ENV
+            echo "DB_URL=${{ secrets.DB_URL_DEV }}" >> $GITHUB_ENV
+            echo "DB_USERNAME=${{ secrets.DB_USERNAME_DEV }}" >> $GITHUB_ENV
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD_DEV }}" >> $GITHUB_ENV
+            echo "DB_DRIVER=${{ secrets.DB_DRIVER_DEV }}" >> $GITHUB_ENV
+          fi
+
+      - name: Deploy to server
+        run: |
+          if [[ $GITHUB_REF == "refs/heads/main" ]]; then
+            echo "Deploying to production server..."
+          elif [[ $GITHUB_REF == "refs/heads/develop" ]]; then
+            echo "Deploying to staging server..."
+          fi
