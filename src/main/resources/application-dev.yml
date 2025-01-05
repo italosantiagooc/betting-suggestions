@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: ${DB_URL_DEV}?useSSL=false&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME_DEV}
+    password: ${DB_PASSWORD_DEV}
+    driver-class-name: ${DB_DRIVER_DEV}
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+
+  server:
+    port: 8080
